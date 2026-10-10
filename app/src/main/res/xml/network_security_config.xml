@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MAPP SAMPLE APP: INTENTIONALLY INSECURE demo material for the MAPP Scan scanner.
+-->
+<network-security-config>
+    <!--
+      MAPP demo: NSC-CLEARTEXT-PERMITTED (cleartextTrafficPermitted="true" app-wide)
+      MAPP demo: NSC-USER-TRUST-ANCHORS (trusts user-installed CAs)
+    -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- MAPP demo: NSC-PIN-SET-WEAK (a single pin and no backup pin; the digest below is fake) -->
+    <domain-config>
+        <domain includeSubdomains="true">demo.example.com</domain>
+        <pin-set expiration="2030-01-01">
+            <pin digest="SHA-256">ZGVtby1wbGFjZWhvbGRlci1waW4tTk9ULVJFQUwtMDA=</pin>
+        </pin-set>
+    </domain-config>
+</network-security-config>

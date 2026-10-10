@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MAPP Sample (insecure on purpose)</string>
+
+    <!-- MAPP demo: SECRET-GOOGLE-API-KEY (fake key shaped like a Google API key, not a real one) -->
+    <string name="maps_api_key" translatable="false">AIzaSyDEMO-NOT-A-REAL-KEY-0000000000000</string>
+
+    <!-- MAPP demo: SECRET-RESOURCE-SECRET-NAME (credential-named resource, fake value) -->
+    <string name="api_secret" translatable="false">demo-secret-value-not-real-1234567890</string>
+</resources>

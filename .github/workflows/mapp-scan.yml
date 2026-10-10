@@ -1,0 +1,67 @@
+# MAPP SAMPLE APP: this app is INTENTIONALLY INSECURE demo material.
+#
+# The workflow builds the debug APK and scans it with the MAPP Scan GitHub
+# Action. After a run, open the repository's Security tab > Code scanning to see
+# the alerts MAPP raised (they come from the SARIF the action uploads). The same
+# report is also attached to the run as an artifact.
+name: MAPP Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # The GitHub-hosted runner image already ships the Android SDK.
+      - name: Build the debug APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      # fail-on: none reports every finding but never fails the job, so the demo
+      # stays green while Security > Code scanning fills up. Use `high` or
+      # `critical` in a real project to turn the scan into a gate.
+      #
+      # Note: until MAPP publishes a release, the action builds `mapp` from
+      # source, which adds a few minutes to the first run.
+      - name: MAPP Scan
+        id: mapp
+        uses: shivbhadrasinhgohil/MAPP@main
+        with:
+          apk: app/build/outputs/apk/debug/app-debug.apk
+          format: sarif
+          fail-on: none
+          upload-sarif: 'true'
+
+      # The action already uploads the report as the artifact "mapp-report";
+      # artifact names must be unique within a run, so these use other names.
+      - name: Upload the SARIF report
+        if: always() && steps.mapp.outputs.report != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: mapp-sarif
+          path: ${{ steps.mapp.outputs.report }}
+
+      - name: Upload the debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
